@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画視聴</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>動画を視聴してください</h2>
+        <p>テストを始める前に、以下の動画を視聴してください。</p>
+        <div class="video-wrapper">
+            <iframe id="youtube-player" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="button-container">
+            <button onclick="history.back()" class="secondary">前の画面に戻る</button>
+            <button onclick="window.location.href='problem1.html'" class="primary">テストを開始する</button>
+        </div>
+        <div id="jump-back-container" style="margin-top: 2em; text-align: center;">
+            <!-- ここにJavaScriptでボタンが自動的に追加されます -->
+        </div>
+    </div>
+
+    <script>
+        const YOUTUBE_VIDEO_ID = 'u4k7CWtDIwY'; // ★★ 動画IDを書き換え ★★
+        document.getElementById('youtube-player').src = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`;
+
+        // ▼▼▼【全面更新】ページ読み込み時のボタン生成スクリプト ▼▼▼
+        window.addEventListener('load', () => {
+            const pathLog = JSON.parse(localStorage.getItem('quizPathLog')) || ['index'];
+            if (pathLog[pathLog.length - 1] !== 'video') { // 重複記録を防ぐ
+                pathLog.push('video');
+                localStorage.setItem('quizPathLog', JSON.stringify(pathLog));
+            }
+            
+            const jumpBackContainer = document.getElementById('jump-back-container');
+            jumpBackContainer.innerHTML = ''; // コンテナを一度空にする
+
+            const lastViewedProblem = localStorage.getItem('quizLastViewedProblem');
+
+            // 「最後に表示した問題」の情報がある場合のみ、特別なボタンを表示
+            if (lastViewedProblem !== null) {
+                const lastProblemIndex = parseInt(lastViewedProblem, 10);
+                const lastProblemNum = lastProblemIndex + 1;
+
+                const title = document.createElement('h3');
+                title.textContent = '中断した問題に戻る';
+                title.style.color = '#2c3e50';
+                jumpBackContainer.appendChild(title);
+
+                const buttonWrapper = document.createElement('div');
+                buttonWrapper.className = 'button-container';
+
+                const resumeButton = document.createElement('button');
+                resumeButton.textContent = `問題${lastProblemNum}に戻る`;
+                resumeButton.className = 'primary'; // 目立たせるためにprimaryスタイルにする
+                resumeButton.onclick = () => {
+                    window.location.href = `problem${lastProblemNum}.html`;
+                };
+                buttonWrapper.appendChild(resumeButton);
+                jumpBackContainer.appendChild(buttonWrapper);
+            }
+        });
+        // ▲▲▲【全面更新】ここまで ▲▲▲
+    </script>
+</body>
+</html>

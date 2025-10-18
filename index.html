@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章問題の理解度テスト</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>文章問題の理解度テスト</h1>
+        <div class="form-group">
+            <label for="name">名前:</label>
+            <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="studentId">学生番号:</label>
+            <input type="text" id="studentId" required>
+        </div>
+        <div class="form-group">
+            <label for="email">メールアドレス:</label>
+            <input type="email" id="email" required>
+        </div>
+        <div class="button-container">
+            <button id="start-btn">次へ</button>
+        </div>
+    </div>
+
+    <!-- (index.html の <div class="button-container">...</div> の直後から) -->
+    <script>
+        document.getElementById('start-btn').addEventListener('click', () => {
+            const userInfo = {
+                name: document.getElementById('name').value,
+                studentId: document.getElementById('studentId').value,
+                email: document.getElementById('email').value,
+            };
+            if (!userInfo.name || !userInfo.studentId || !userInfo.email) {
+                alert('すべての項目を入力してください。');
+                return;
+            }
+            // ユーザー情報を保存
+            localStorage.setItem('quizUserInfo', JSON.stringify(userInfo));
+            
+            // ▼▼▼【更新】すべてのログをここで初期化する ▼▼▼
+            localStorage.setItem('quizUserResults', JSON.stringify([])); // 解答結果
+            localStorage.setItem('quizTimeLogs', JSON.stringify({}));   // 時間計測ログ
+            localStorage.setItem('quizPathLog', JSON.stringify(['index'])); // 移動ログ (最初のページはindex)
+            localStorage.removeItem('quizLastViewedProblem'); // 中断ログも消去
+            // ▲▲▲【更新】ここまで ▲▲▲
+
+            window.location.href = 'video.html';
+        });
+    </script>
+</body>
+</html>

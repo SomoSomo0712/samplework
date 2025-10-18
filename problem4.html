@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>問題4</title> <!-- ← ★★問題ごとに変更★★ -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>問題4/5</h2> <!-- ← ★★問題ごとに変更★★ -->
+        
+        <!-- ▼▼▼ 問題の内容をここに記述 ▼▼▼ -->
+        <p id="question-text">日本の現在の首都はどこですか？</p>
+        <div id="options-container" class="options-container">
+            <label><input type="radio" name="answer" value="京都">京都</label>
+            <label><input type="radio" name="answer" value="大阪">大阪</label>
+            <label><input type="radio" name="answer" value="東京">東京</label>
+            <label><input type="radio" name="answer" value="奈良">奈良</label>
+        </div>
+        <!-- ▲▲▲ 問題の内容ここまで ▲▲▲ -->
+
+        <div class="button-container">
+            <button id="back-btn" class="secondary">戻る</button>
+            <button id="video-btn" class="secondary">動画に戻る</button> <!-- IDを追加 -->
+            <button id="next-btn" class="primary">次へ</button>
+        </div>
+    </div>
+
+    <script>
+        // --- この問題専用の設定 ---
+        const questionIndex = 3; // ★★問題ごとに変更★★
+        const questionText = "日本の現在の首都はどこですか？"; // ★★問題ごとに変更★★
+        const correctAnswer = "東京"; // ★★問題ごとに変更★★
+        const nextPage = "problem5.html"; // ★★問題ごとに変更★★
+        // -------------------------
+
+        // ▼▼▼【全面更新】ここから下のスクリプトはどの問題でも共通 ▼▼▼
+        let entryTime = Date.now(); // このページを開いた時刻
+
+        // ページを離れる直前に、滞在時間を計算して保存する関数
+        const saveSessionTime = () => {
+            const timeLogs = JSON.parse(localStorage.getItem('quizTimeLogs')) || {};
+            const sessionDuration = (Date.now() - entryTime) / 1000;
+            const currentTotal = timeLogs[questionIndex] || 0;
+            timeLogs[questionIndex] = currentTotal + sessionDuration;
+            localStorage.setItem('quizTimeLogs', JSON.stringify(timeLogs));
+        };
+        
+        // ページ読み込み時の処理
+        window.addEventListener('DOMContentLoaded', () => {
+            // ログ関連の記録
+            localStorage.setItem('quizLastViewedProblem', questionIndex);
+            const pathLog = JSON.parse(localStorage.getItem('quizPathLog')) || [];
+            pathLog.push(`problem${questionIndex + 1}`);
+            localStorage.setItem('quizPathLog', JSON.stringify(pathLog));
+            
+            // 以前の回答を復元
+            const userResults = JSON.parse(localStorage.getItem('quizUserResults')) || [];
+            const savedResult = userResults.find(r => r.questionIndex === questionIndex);
+            if (savedResult) {
+                const radio = document.querySelector(`input[name="answer"][value="${savedResult.answer}"]`);
+                if (radio) radio.checked = true;
+            }
+        });
+
+        // ブラウザを閉じたり更新しようとした時に時間を保存する
+        window.addEventListener('beforeunload', saveSessionTime);
+
+        // ナビゲーションボタンの処理
+        document.getElementById('back-btn').addEventListener('click', () => {
+            saveSessionTime();
+            if (questionIndex === 0) window.location.href = 'video.html';
+            else window.location.href = `problem${questionIndex}.html`;
+        });
+        document.getElementById('video-btn').addEventListener('click', () => {
+            saveSessionTime();
+            window.location.href = 'video.html';
+        });
+        document.getElementById('next-btn').addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (!selectedOption) {
+                alert('回答を選択してください。');
+                return;
+            }
+            saveSessionTime(); // ★解答時間を保存してから次に進む
+
+            const userResults = JSON.parse(localStorage.getItem('quizUserResults')) || [];
+            const otherResults = userResults.filter(r => r.questionIndex !== questionIndex);
+            const answer = selectedOption.value;
+            const newResult = {
+                questionIndex,
+                question: `(問題${questionIndex + 1}) ${questionText}`,
+                answer,
+                isCorrect: answer === correctAnswer
+                // 時間(time)は最後の結果ページでまとめて挿入する
+            };
+            otherResults.push(newResult);
+            localStorage.setItem('quizUserResults', JSON.stringify(otherResults));
+            window.location.href = nextPage;
+        });
+    </script>
+</body>
+</html>
